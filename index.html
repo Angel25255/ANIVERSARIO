@@ -1,1 +1,142 @@
-<h1>aniversario </h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Invitación Angel & Isabel</title>
+  <style>
+    body { margin:0; overflow:hidden; background:#0d0d0d; color:white; font-family:'Segoe UI',sans-serif; }
+    #overlay {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center;
+      flex-direction:column; text-align:center; z-index:10;
+    }
+    #openBtn {
+      background:#e63946; color:white; border:none; padding:20px 40px;
+      font-size:26px; border-radius:14px; cursor:pointer; transition:0.3s;
+    }
+    #openBtn:hover { transform:scale(1.1); background:#d62839; }
+    .content {
+      display:none; position:absolute; top:0; left:0; width:100%; height:100%;
+      overflow-y:auto; padding:40px; background:rgba(0,0,0,0.7);
+    }
+    .section { margin:40px auto; max-width:800px; background:white; color:#333; padding:30px; border-radius:20px; }
+    h2 { color:#e63946; }
+    .countdown { font-size:30px; margin:20px 0; color:#222; }
+    canvas { position:absolute; top:0; left:0; }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <h1 style="margin-bottom:20px;">💌 Nuestra Carta Especial</h1>
+    <button id="openBtn">📩 Ábreme</button>
+  </div>
+
+  <canvas id="bg"></canvas>
+
+  <div class="content" id="content">
+    <div class="section">
+      <h2>Nuestra Carta Especial</h2>
+      <p>Te invitamos a la pedida de mano de <b>ANGEL</b> y <b>ISABEL</b>, donde celebraremos juntos el comienzo de una nueva etapa. 🌿</p>
+    </div>
+
+    <div class="section">
+      <p>Dios, en su infinita bondad, nos ha concedido el privilegio de conocernos y de amarnos... 💍</p>
+      <p><b>Padres del novio:</b> Filomena Ordoñez Martinez<br>
+         <b>Padres de la novia:</b> Carmen Huacho</p>
+      <p><a href="https://docs.google.com/forms/d/e/1FAIpQLScIzAnm6RsgEfwAIF36pWdMGpdqysL-MbljlJV6dQAgWXUi1g/viewform?usp=header" target="_blank">📋 Confirma tu asistencia aquí</a></p>
+    </div>
+
+    <div class="section">
+      <h2>⏳ Falta para el gran día</h2>
+      <div id="countdown" class="countdown"></div>
+      <div class="calendar">
+        <iframe src="https://calendar.google.com/calendar/embed?mode=MONTH&dates=20251025/20251025"
+                style="border:0" width="600" height="400" frameborder="0" scrolling="no"></iframe>
+      </div>
+    </div>
+
+    <div class="section">
+      <p>“Gracias por ser parte de nuestra historia de amor.” 💖<br>
+      “Tu presencia será el mejor regalo en este día tan especial.” 🎁<br>
+      “Los esperamos con mucho cariño.” 🌸<br>
+      “Con amor, Angel & Isabel.” 💕</p>
+    </div>
+  </div>
+
+  <script>
+    // Partículas tipo flor + fuegos artificiales
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    class Particle {
+      constructor(x,y,color,size,life){
+        this.x=x; this.y=y; this.color=color; this.size=size;
+        this.life=life; this.angle=Math.random()*Math.PI*2;
+        this.speed=Math.random()*2+1;
+      }
+      update(){
+        this.x+=Math.cos(this.angle)*this.speed;
+        this.y+=Math.sin(this.angle)*this.speed;
+        this.life--;
+      }
+      draw(){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+        ctx.fillStyle=this.color;
+        ctx.fill();
+      }
+    }
+
+    function animate(){
+      ctx.fillStyle="rgba(0,0,0,0.2)";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      particles.forEach((p,i)=>{
+        p.update(); p.draw();
+        if(p.life<=0) particles.splice(i,1);
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    function burst(x,y){
+      for(let i=0;i<80;i++){
+        particles.push(new Particle(x,y,
+          `hsl(${Math.random()*360},100%,60%)`,
+          Math.random()*3+2,60+Math.random()*40));
+      }
+    }
+
+    // Botón abrir
+    document.getElementById('openBtn').addEventListener('click', ()=>{
+      document.getElementById('overlay').style.display="none";
+      document.getElementById('content').style.display="block";
+      // flor inicial
+      for(let i=0;i<12;i++){
+        setTimeout(()=>burst(canvas.width/2,canvas.height/2),i*300);
+      }
+    });
+
+    // Countdown
+    const target = new Date("2025-10-25T00:00:00").getTime();
+    setInterval(()=>{
+      const now = new Date().getTime();
+      const diff = target - now;
+      if(diff > 0){
+        const d = Math.floor(diff/(1000*60*60*24));
+        const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        const m = Math.floor((diff%(1000*60*60))/(1000*60));
+        const s = Math.floor((diff%(1000*60))/1000);
+        document.getElementById("countdown").innerHTML = `${d} días ${h}h ${m}m ${s}s`;
+      }
+    },1000);
+  </script>
+</body>
+</html>
